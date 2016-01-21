@@ -64,6 +64,9 @@ class State:
 
 
 class Game:
+    '''
+    Creates players and starts the game.
+    '''
     def __init__(self):
         self.xo = ['X', 'O']
         self.s = State()

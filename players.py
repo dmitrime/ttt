@@ -3,6 +3,9 @@ import operator
 
 
 class Player(object):
+    '''
+    Base class.
+    '''
     def __init__(self, xo, opponent):
         self.xo = xo
         self.opponent = opponent
@@ -12,6 +15,9 @@ class Player(object):
 
 
 class UserPlayer(Player):
+    '''
+    Human player.
+    '''
     def __init__(self, xo, other):
         super(UserPlayer, self).__init__(xo, other)
 
@@ -34,11 +40,17 @@ class UserPlayer(Player):
 
 
 class AIPlayer(Player):
+    '''
+    Computer player.
+    '''
     def __init__(self, xo, other):
         super(AIPlayer, self).__init__(xo, other)
         self.MAX_DEPTH = 6
 
     def evaluate(self, win, lose):
+        '''
+        Assign scores to a state given possible situations.
+        '''
         if win:
             return 1
         elif lose:
@@ -47,6 +59,11 @@ class AIPlayer(Player):
             return 0
 
     def minimax(self, depth, s, us, them):
+        '''
+        Simulate the game down to a given depth by switching players
+        making their moves and both choosing the best ones.
+        Each move is assined a score and the move with the best score is made.
+        '''
         isFull, isWin, isLose = s.isBoardFull(), s.isWinning(self.xo), s.isWinning(self.opponent)
         if depth == 0 or isFull or isWin or isLose:
             return self.evaluate(isWin, isLose), None

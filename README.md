@@ -1,2 +1,4 @@
 # ttt
-Tic tac toe with AI
+Tic tac toe with minimax AI.
+
+
