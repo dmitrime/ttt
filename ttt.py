@@ -8,26 +8,31 @@ class State:
     '''
     Holds the state of the game.
     '''
-    def __init__(self):
+    def __init__(self, size):
+        self.n = size
         self.board = self._empty_board()
 
     def _rows(self, b):
-        return [b[:3], b[3:6], b[6:]]
+        n = self.n
+        return [b[i:i+n] for i in range(0, n*n, n)]
 
     def _cols(self, b):
         '''
         Returns the columns of the board.
         '''
-        return [[b[i], b[i+3], b[i+6]] for i in range(3)]
+        n = self.n
+        return [[b[i+j] for j in range(0, n*n, n)] for i in range(n)]
 
     def _diag(self, b):
         '''
         Returns the diagonals of the board.
         '''
-        return [[b[0], b[4], b[8]], [b[2], b[4], b[6]]]
+        n = self.n
+        return [[b[i+i*n] for i in range(n)],
+                       [b[n-i-1+i*n] for i in range(n)]]
 
     def _empty_board(self):
-        return [None]*9
+        return [None]*(self.n*self.n)
 
     def isBoardFull(self):
         return all(self.board)
@@ -36,7 +41,7 @@ class State:
         '''
         Checks if "player" has won.
         '''
-        win = [player]*3
+        win = [player]*self.n
         pos = self._rows(self.board) + \
               self._cols(self.board) + \
               self._diag(self.board)
@@ -44,9 +49,9 @@ class State:
 
     def show(self):
         for i in range(len(self.board)):
-            if i % 3 == 0:
-                print
-            print '{} '.format(self.board[i] if self.board[i] else i+1),
+            if i % self.n == 0:
+                print '\n'
+            print '{}\t'.format(self.board[i] if self.board[i] else i+1),
         print '\n'
 
     def canPut(self, i):
@@ -68,9 +73,10 @@ class Game:
     '''
     Creates players and starts the game.
     '''
-    def __init__(self):
+    def __init__(self, size):
         self.xo = ['X', 'O']
-        self.s = State()
+        self.s = State(size)
+        self.size = size
 
     def assignXO(self):
         p = random.randint(0, 1)
@@ -87,8 +93,8 @@ class Game:
     def play(self):
         print 'New game'
         p1, p2 = self.assignXO()
-        usr = UserPlayer(p1, p2)
-        ai = AIPlayer(p2, p1)
+        usr = UserPlayer(p1, p2, self.size)
+        ai = AIPlayer(p2, p1, self.size)
 
         if usr.xo == self.first():
             print 'User starts the game with \'{}\''.format(self.first())
@@ -112,4 +118,15 @@ class Game:
 
 
 if __name__ == '__main__':
-    Game().play()
+    n = 3
+    while True:
+        print 'Enter number the size of the board: 3, 4 or 5'
+        try:
+            n = int(raw_input())
+            if n not in [3, 4, 5]:
+                raise ValueError
+            break
+        except ValueError as e:
+            print "Choose either 3, 4 or 5."
+
+    Game(n).play()

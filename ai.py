@@ -7,9 +7,9 @@ class AIPlayer(Player):
     '''
     Computer player.
     '''
-    def __init__(self, xo, other):
-        super(AIPlayer, self).__init__(xo, other)
-        self.MAX_DEPTH = 10
+    def __init__(self, xo, other, size):
+        super(AIPlayer, self).__init__(xo, other, size)
+        self.MAX_DEPTH = 6
 
     def evaluate(self, win, lose):
         '''
