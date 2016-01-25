@@ -9,7 +9,7 @@ class AIPlayer(Player):
     '''
     def __init__(self, xo, other):
         super(AIPlayer, self).__init__(xo, other)
-        self.MAX_DEPTH = 6
+        self.MAX_DEPTH = 10
 
     def evaluate(self, win, lose):
         '''
@@ -22,7 +22,7 @@ class AIPlayer(Player):
         else:
             return 0
 
-    def minimax(self, depth, s, us, them):
+    def minimax(self, depth, s, us, them, alpha, beta):
         '''
         Simulate the game down to a given depth by switching players
         making their moves and both choosing the best ones.
@@ -34,27 +34,30 @@ class AIPlayer(Player):
 
         allMoves = [i for i in range(len(s.board)) if s.canPut(i)]
 
-        if self.xo == us:
-            topScore = float('-inf')
-            condition = operator.gt
-        else:
-            topScore = float('inf')
-            condition = operator.lt
-
         topPos = None
         for pos in allMoves:
             s.put(us, pos)
-            score, _ = self.minimax(depth-1, s, them, us)
-            #if depth == self.MAX_DEPTH:
-                #print 'putting {} in {}: score = {}'.format(us, pos+1, score)
+            score, _ = self.minimax(depth-1, s, them, us, alpha, beta)
             s.unput(pos)
-            if condition(score, topScore):
-                topScore, topPos = score, pos
-        return topScore, topPos
+
+            if self.xo == us and score > alpha:
+                alpha, topPos = score, pos
+            elif self.xo != us and score < beta:
+                beta, topPos = score, pos
+
+            if alpha >= beta:
+                break
+
+        return alpha if self.xo == us else beta, topPos
 
     def makeMove(self, state):
         print 'AI thinking...',
-        _, pos = self.minimax(self.MAX_DEPTH, state, self.xo, self.opponent)
+        _, pos = self.minimax(self.MAX_DEPTH,
+                              state,
+                              self.xo,
+                              self.opponent,
+                              float('-inf'),
+                              float('inf'))
         print 'AI\'s move: {}'.format(pos+1)
         state.put(self.xo, pos)
         state.show()
