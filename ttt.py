@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import copy
 import random
-from players import UserPlayer, AIPlayer
+from player import UserPlayer
+from ai import AIPlayer
 
 class State:
     '''
