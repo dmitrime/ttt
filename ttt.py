@@ -12,22 +12,25 @@ class State:
         self.n = size
         self.board = self._empty_board()
 
-    def _rows(self, b):
+    def rows(self):
         n = self.n
+        b = self.board
         return [b[i:i+n] for i in range(0, n*n, n)]
 
-    def _cols(self, b):
+    def cols(self):
         '''
         Returns the columns of the board.
         '''
         n = self.n
+        b = self.board
         return [[b[i+j] for j in range(0, n*n, n)] for i in range(n)]
 
-    def _diag(self, b):
+    def diag(self):
         '''
         Returns the diagonals of the board.
         '''
         n = self.n
+        b = self.board
         return [[b[i+i*n] for i in range(n)],
                        [b[n-i-1+i*n] for i in range(n)]]
 
@@ -42,9 +45,7 @@ class State:
         Checks if "player" has won.
         '''
         win = [player]*self.n
-        pos = self._rows(self.board) + \
-              self._cols(self.board) + \
-              self._diag(self.board)
+        pos = self.rows() + self.cols() + self.diag()
         return any([win == x for x in pos])
 
     def show(self):

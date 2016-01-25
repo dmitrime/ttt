@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import operator
 from player import Player
 
 
@@ -9,18 +8,29 @@ class AIPlayer(Player):
     '''
     def __init__(self, xo, other, size):
         super(AIPlayer, self).__init__(xo, other, size)
-        self.MAX_DEPTH = 6
+        self.MAX_DEPTH = 10
+        if size == 4:
+            self.MAX_DEPTH = 7
+        elif size == 5:
+            self.MAX_DEPTH = 5
+        self.WIN_SCORE = 7777777
 
-    def evaluate(self, win, lose):
+    def evaluate(self, s, us, them):
         '''
         Assign scores to a state given possible situations.
+        Count the number of our positions and their positions
+        on each row, column and diagonal.
         '''
-        if win:
-            return 1
-        elif lose:
-            return -1
-        else:
-            return 0
+        score = 0
+        lines = s.rows() + s.cols() + s.diag()
+        for r in lines:
+            a = r.count(us) * self.size
+            b = r.count(them) * self.size
+            if a > 0 and b == 0:
+                score += a * self.size
+            elif a == 0 and b > 0:
+                score -= b * self.size
+        return score
 
     def minimax(self, depth, s, us, them, alpha, beta):
         '''
@@ -28,9 +38,12 @@ class AIPlayer(Player):
         making their moves and both choosing the best ones.
         Each move is assined a score and the move with the best score is made.
         '''
-        isFull, isWin, isLose = s.isBoardFull(), s.isWinning(self.xo), s.isWinning(self.opponent)
-        if depth == 0 or isFull or isWin or isLose:
-            return self.evaluate(isWin, isLose), None
+        if s.isWinning(self.xo):
+            return self.WIN_SCORE, None
+        if s.isWinning(self.opponent):
+            return -self.WIN_SCORE, None
+        if depth == 0 or s.isBoardFull():
+            return self.evaluate(s, us, them), None
 
         allMoves = [i for i in range(len(s.board)) if s.canPut(i)]
 
@@ -38,6 +51,8 @@ class AIPlayer(Player):
         for pos in allMoves:
             s.put(us, pos)
             score, _ = self.minimax(depth-1, s, them, us, alpha, beta)
+            #if depth == 1:
+                #print score
             s.unput(pos)
 
             if self.xo == us and score > alpha:
